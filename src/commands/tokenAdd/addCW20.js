@@ -25,7 +25,7 @@ module.exports = {
               },
               {
                 name: 'Or create your own DAO and cw20 token',
-                value: 'Visit: https://daodao.zone to find or create a new DAO. The DAODAO Url looks something like this: https://daodao.zone/dao/juno156vlvprfxc4yyu26ute4hu6tjq96pxgt5qqmm0zlt4y0khjetvhqdhmgdm',
+                value: 'Visit: https://daodao.zone to find or create a new DAO. The DAO DAO URL looks something like this: https://daodao.zone/dao/juno156vlvprfxc4yyu26ute4hu6tjq96pxgt5qqmm0zlt4y0khjetvhqdhmgdm',
                 inline: true
               }
           ],
@@ -37,7 +37,7 @@ module.exports = {
           value: 'CW20',
         },
         {
-          label: "☯️ I have a DAODAO URL",
+          label: "☯️ I have a DAO DAO URL",
           value: 'DAODAO',
         },
       ]

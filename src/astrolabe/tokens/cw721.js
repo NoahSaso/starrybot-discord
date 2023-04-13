@@ -1,97 +1,131 @@
 const { CosmWasmClient } = require("@cosmjs/cosmwasm-stargate");
-const { getConnectionFromPrefix, getConnectionFromToken, getPrefixFromToken } = require('../networks')
+const {
+  getConnectionFromPrefix,
+  getConnectionFromToken,
+  getPrefixFromToken,
+} = require("../networks");
 const { Bech32 } = require("@cosmjs/encoding");
 
 const checkForCW721 = async (cosmClient, cw721Input) => {
   return cosmClient.queryContractSmart(cw721Input, {
-    contract_info: { },
+    contract_info: {},
   });
-}
+};
 
 const attemptCW721Lookup = async (cw721Input, network) => {
-  let rpcEndpoint = getConnectionFromToken(cw721Input, 'rpc', network)
-  let cosmClient = await CosmWasmClient.connect(rpcEndpoint)
-  return await checkForCW721(cosmClient, cw721Input)
-}
+  let rpcEndpoint = getConnectionFromToken(cw721Input, "rpc", network);
+  let cosmClient = await CosmWasmClient.connect(rpcEndpoint);
+  return await checkForCW721(cosmClient, cw721Input);
+};
 
 const getTokenInfo = async ({ tokenAddress, network }) => {
   let tokenInfo;
 
   // If they defined network use it
   if (network) {
-    tokenInfo = await attemptCW721Lookup(tokenAddress, network)
+    tokenInfo = await attemptCW721Lookup(tokenAddress, network);
   } else {
     // No network defined, check for existence on mainnet then testnet
-    network = 'mainnet';
+    network = "mainnet";
     try {
-      tokenInfo = await attemptCW721Lookup(tokenAddress, network)
+      tokenInfo = await attemptCW721Lookup(tokenAddress, network);
     } catch {
       // Nothing was found on mainnet but this could still be on testnet,
       // so swallow the error and try testnet instead
-      network = 'testnet'
-      tokenInfo = await attemptCW721Lookup(tokenAddress, network)
+      network = "testnet";
+      tokenInfo = await attemptCW721Lookup(tokenAddress, network);
     }
   }
-  return { token: tokenInfo, network }
-}
+  return { token: tokenInfo, network };
+};
 
-const getCW721TokenDetails = async ({tokenAddress, network}) => {
-  let tokenInfo = await getTokenInfo({tokenAddress, network})
+const getCW721TokenDetails = async ({ tokenAddress, network }) => {
+  let tokenInfo = await getTokenInfo({ tokenAddress, network });
 
   return {
     network: tokenInfo.network,
     cw721: tokenAddress,
-    tokenType: 'cw721',
+    tokenType: "cw721",
     tokenSymbol: tokenInfo.token.symbol,
     decimals: null, // keep null
+  };
+};
+
+const getStakedCW721TokenBalance = async ({
+  keplrAccount,
+  tokenAddress,
+  network,
+  extra,
+}) => {
+  const decodedAccount = Bech32.decode(keplrAccount).data;
+  const prefix = getPrefixFromToken(tokenAddress);
+  if (!prefix) throw "Could not determine prefix";
+  const encodedAccount = Bech32.encode(prefix, decodedAccount);
+  const rpcEndpoint = getConnectionFromPrefix(prefix, "rpc", network);
+  const cosmClient = await CosmWasmClient.connect(rpcEndpoint);
+  let balance = 0;
+  if (extra?.staking_contract) {
+    const stakedTokens = Number(
+      (
+        await cosmClient.queryContractSmart(extra["staking_contract"], {
+          voting_power_at_height: { address: encodedAccount },
+        })
+      ).power
+    );
+    console.log("Found staked tokens", stakedTokens);
+    balance = stakedTokens;
   }
-}
 
-const getStakedCW721TokenBalance = async ({keplrAccount, tokenAddress, network, extra}) => {
-  // At the time of this writing, there is no NFT staking, so always return 0
-  return 0
-}
+  return balance;
+};
 
-const getCW721TokenBalance = async ({keplrAccount, tokenAddress, network, extra}) => {
+const getCW721TokenBalance = async ({
+  keplrAccount,
+  tokenAddress,
+  network,
+  extra,
+}) => {
   // Given the wallet address, NFT collection address,
   // and the network it's on, do the math for the following correctly
   const decodedAccount = Bech32.decode(keplrAccount).data;
   const prefix = getPrefixFromToken(tokenAddress);
-  if (!prefix) throw 'Could not determine prefix';
+  if (!prefix) throw "Could not determine prefix";
 
   const encodedAccount = Bech32.encode(prefix, decodedAccount);
-  const rpcEndpoint = getConnectionFromPrefix(prefix, 'rpc', network);
+  const rpcEndpoint = getConnectionFromPrefix(prefix, "rpc", network);
   const cosmClient = await CosmWasmClient.connect(rpcEndpoint);
   const nftInfo = await cosmClient.queryContractSmart(tokenAddress, {
     tokens: {
       owner: encodedAccount,
       start_after: null,
-      limit: 100
-    }
+      limit: 100,
+    },
   });
 
   // Return the # of NFTs this user has from this wallet
   return parseInt(nftInfo.tokens.length);
-}
+};
 
 const isCW721 = async (tokenAddress, network) => {
-  let tokenInfo = await getTokenInfo({tokenAddress, network})
+  let tokenInfo = await getTokenInfo({ tokenAddress, network });
   // Expecting this format for tokenInfo.token:
   // { name: 'Passage Marketplace', symbol: 'yawp' }
-  return tokenInfo.token &&
+  return (
+    tokenInfo.token &&
     // This line below was changed since it seems folks are adding additional fields
     // so we're expecting it to have *at least* name and symbol
     Object.keys(tokenInfo.token).length >= 2 &&
-    tokenInfo.token.hasOwnProperty('name') &&
-    tokenInfo.token.hasOwnProperty('symbol');
-}
+    tokenInfo.token.hasOwnProperty("name") &&
+    tokenInfo.token.hasOwnProperty("symbol")
+  );
+};
 
 module.exports = {
   cw721: {
-    name: 'CW721',
+    name: "CW721",
     isTokenType: isCW721,
     getTokenBalance: getCW721TokenBalance,
     getStakedTokenBalance: getStakedCW721TokenBalance,
     getTokenDetails: getCW721TokenDetails,
-  }
-}
+  },
+};

@@ -13,10 +13,10 @@ module.exports = {
           title: `Configure ${selectedOption} Token Rule`,
           inputs: [
             {
-              label: selectedOption === 'CW20' ? 'Token Address' : 'DAODAO URL',
+              label: selectedOption === 'CW20' ? 'Token Address' : 'DAO DAO URL',
               placeholder: selectedOption === 'CW20' ?
                 'Please enter the CW20 token address' :
-                "Paste your DAODAO URL and we'll take care of the rest!",
+                "Paste your DAO DAO URL and we'll take care of the rest!",
               id: 'token-address',
               required: true,
             },

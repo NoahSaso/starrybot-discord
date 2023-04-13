@@ -3,7 +3,7 @@ module.exports = {
   createTokenRule: {
     getConfig: async (state, {
       astrolabe: { getTokenDetails },
-      daodao: { isDaoDaoAddress, getCW20InputFromDaoDaoDao },
+      daodao: { isDaoDaoAddress, getInputFromDaoDaoDao },
       stargaze: { isStargazeLaunchpadAddress, getCW721FromStargazeUrl },
     }) => {
       // Required for every flow in token-rule add
@@ -21,7 +21,13 @@ module.exports = {
         if (tokenAddress) {
           try {
             if (isDaoDaoAddress(tokenAddress)) {
-              const daoDetails = await getCW20InputFromDaoDaoDao(tokenAddress);
+              const daoDetails = await getInputFromDaoDaoDao(tokenAddress);
+              if (daoDetails.type !== state.tokenType) {
+                return {
+                  error: `DAO DAO type mismatch. DAO is of type ${daoDetails.type} but selected token is of type ${state.tokenType}.`,
+                };
+              }
+
               tokenAddress = daoDetails.govToken
               state.stakingContract = daoDetails.stakingContract;
             } else if (isStargazeLaunchpadAddress(tokenAddress)) {

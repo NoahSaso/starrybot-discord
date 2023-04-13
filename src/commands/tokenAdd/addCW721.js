@@ -19,6 +19,11 @@ module.exports = {
               inline: false,
             },
             {
+              name: 'Create your own DAO with an NFT collection',
+              value: 'Visit: https://daodao.zone to find or create a new DAO. The DAO DAO URL looks something like this: https://daodao.zone/dao/juno156vlvprfxc4yyu26ute4hu6tjq96pxgt5qqmm0zlt4y0khjetvhqdhmgdm',
+              inline: true
+            },
+            {
               name: 'Stargaze Launchpad',
               value: 'If you know the Launchpad URL for the NFT collection you would like to make a token rule for, we can use that instead! It should look something like this: https://app.stargaze.zone/launchpad/stars1lndsj2gufd292c35crv97ug2ncdcn9ys4s8e94wlxyeft6mt3k2svkwps9',
               inline: true
@@ -30,6 +35,10 @@ module.exports = {
         {
           label: '🎨 I have a CW721 token',
           value: 'CW721',
+        },
+        {
+          label: "☯️ I have a DAO DAO URL",
+          value: 'DAODAO',
         },
         {
           label: '💫  I have a Stargaze Launchpad URL',
