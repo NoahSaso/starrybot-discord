@@ -34,7 +34,7 @@ async function interactionCreate(interaction) {
 		return handleGuildCommands(interaction);
 	} else {
 		let interactionType;
-		if (interaction.isSelectMenu()) {
+		if (interaction.isStringSelectMenu()) {
 			interactionType = 'select';
 		} else if (interaction.isButton()) {
 			interactionType = 'button';

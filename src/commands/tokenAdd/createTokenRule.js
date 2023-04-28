@@ -22,11 +22,12 @@ module.exports = {
           try {
             if (isDaoDaoAddress(tokenAddress)) {
               const daoDetails = await getInputFromDaoDaoDao(tokenAddress);
+              /*
               if (daoDetails.type !== state.tokenType) {
                 return {
                   error: `DAO DAO type mismatch. DAO is of type ${daoDetails.type} but selected token is of type ${state.tokenType}.`,
                 };
-              }
+              }*/
 
               tokenAddress = daoDetails.govToken
               state.stakingContract = daoDetails.stakingContract;

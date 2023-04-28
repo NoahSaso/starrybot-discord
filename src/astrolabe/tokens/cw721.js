@@ -107,17 +107,21 @@ const getCW721TokenBalance = async ({
 };
 
 const isCW721 = async (tokenAddress, network) => {
-  let tokenInfo = await getTokenInfo({ tokenAddress, network });
-  // Expecting this format for tokenInfo.token:
-  // { name: 'Passage Marketplace', symbol: 'yawp' }
-  return (
-    tokenInfo.token &&
-    // This line below was changed since it seems folks are adding additional fields
-    // so we're expecting it to have *at least* name and symbol
-    Object.keys(tokenInfo.token).length >= 2 &&
-    tokenInfo.token.hasOwnProperty("name") &&
-    tokenInfo.token.hasOwnProperty("symbol")
-  );
+  try {
+    let tokenInfo = await getTokenInfo({tokenAddress, network});
+    // Expecting this format for tokenInfo.token:
+    // { name: 'Passage Marketplace', symbol: 'yawp' }
+    return (
+        tokenInfo.token &&
+        // This line below was changed since it seems folks are adding additional fields
+        // so we're expecting it to have *at least* name and symbol
+        Object.keys(tokenInfo.token).length >= 2 &&
+        tokenInfo.token.hasOwnProperty("name") &&
+        tokenInfo.token.hasOwnProperty("symbol")
+    );
+  } catch {
+    return false;
+  }
 };
 
 module.exports = {
