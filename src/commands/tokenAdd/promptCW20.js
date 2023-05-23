@@ -5,6 +5,7 @@ module.exports = {
       // See which button they pressed and update the state appropriatley
       const selectedOption = state.interactionTarget.customId;
       state.selectedOption = selectedOption;
+      state.tokenType = 'cw20'
 
       return {
         next: 'createTokenRule',

@@ -16,6 +16,7 @@ const getTokenType = async (tokenInput) => {
     const isType = await tokenType.isTokenType(tokenInput)
     if (isType) return tokenType
   }
+  throw `Unknown token type ${tokenInput}`
 }
 
 // Identify what type of token we have, then call
